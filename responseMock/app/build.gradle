@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.example.home.mockapiresponse"
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled  true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    testCompile 'junit:junit:4.12'
+
+
+    //retrofit2
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+
+    //Gson
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.google.code.gson:gson:2.5'
+
+    //MockWebServer - Version 2.2 of mockwebserver doesn't work because of an issue, so forcing v2.1 - https://github.com/square/okhttp/issues/1069
+    androidTestCompile('com.squareup.okhttp:mockwebserver:2.1.0') {
+        exclude module: 'okhttp'
+    }
+
+    //WireMock
+    androidTestCompile("com.github.tomakehurst:wiremock:2.1.7") {
+        //Allows us to use the Android version of Apache httpclient instead
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+
+        //Resolves the Duplicate Class Exception
+        //Error:Execution failed for task ':app:transformClassesWithJarMergingForDebugAndroidTest'.
+        //       > com.android.build.api.transform.TransformException: java.util.zip.ZipException: duplicate entry: org/objectweb/asm/AnnotationVisitor.class
+        exclude group: 'asm', module: 'asm'
+
+        //Fixes conflict with Android's version
+        //Warning:Dependency org.json:json:20090211 is ignored for debugAndroidTest as it may be conflicting with the internal version provided by Android.
+        //In case of problem, please repackage with jarjar to change the class packages
+        exclude group: 'org.json', module: 'json'
+    }
+    //WireMock supporting dependency
+    androidTestCompile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
+    androidTestCompile 'commons-io:commons-io:2.4'
+
+
+
+}
